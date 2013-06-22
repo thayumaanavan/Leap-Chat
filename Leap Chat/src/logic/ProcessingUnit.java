@@ -52,7 +52,7 @@ public class ProcessingUnit {
 		trainingSample=new Matrix();
 		recognition=new DTW();
 		count=0;
-		countArr=new Double[1000];
+		countArr=new Double[32000];
 		current=new LabelledTimeSeriesClassificationData(9, null, null);
 		//current.setNumDim(9);
 		
@@ -88,15 +88,20 @@ public class ProcessingUnit {
 	 
 	 Boolean isNullData()
 	 {
-		 if(countArr.length>50)
+		 int zero=0;
+		 if(count>150)
 		 {
-			 for(int i=countArr.length;i>countArr.length-50;i--)
+			 for(int i=count;i>countArr.length-50;i--)
 			 {
-				 if(countArr[i]!=0.0)
-					 return false;
+				 if(countArr[i]==0.0)
+					 zero++;
 			 }
-					 
+			 count=0;
+			 if(zero/150 > 0.9)
+				 return true;
+			 else	 
 					return true; 
+					
 		 }
 		 else
 			 return false;
@@ -407,7 +412,7 @@ public class ProcessingUnit {
             
 		
 		//String[] sign={"Student","Super","North","South","Four","Olympic Ring","Victory","Warning","Circle","Kill","Five"};
-		String[] signs={"Student","North","South","West","East","Four","Olympic Ring","House","Swap","Scissor"};
+		String[] signs={"what is your name?","Hi!","How are you?","what are you doing?","Whats up?","lol"};
 		System.out.println(signs[id]);
 		
 		/*switch(id)

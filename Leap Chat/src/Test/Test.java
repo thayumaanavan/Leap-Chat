@@ -73,31 +73,33 @@ class TestListener extends Listener {
 
 
 class Test {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Create a sample listener and controller
         TestListener listener = new TestListener();
         Controller controller = new Controller();
 
         // Have the sample listener receive events from the controller
         controller.addListener(listener);
-        
+        listener.gesture.load("gesture.txt");
+		listener.gesture.train();
         while(true)
         {
-        	try {
+        	
         		Scanner in = new Scanner(System.in);
-        		int ch=in.nextInt();
-        		if(ch==1)
-        		{
+        		System.out.println("1.Start Gesture\n2.Stop Gesture");
         		
-        			listener.gesture.load("gesture.txt");
-        			listener.gesture.train();
+        		int ch=in.nextInt();
+        		while(ch!=2)
+        		{
         			listener.gesture.startRecognition();
-        			
-        			
         		}
-        	}catch (IOException e) {
-                e.printStackTrace();
-            	}
+        		
+        			listener.gesture.stopRecognition();
+        			System.out.println();
+        			
+        			
+        			
+        		
         }
         
         
