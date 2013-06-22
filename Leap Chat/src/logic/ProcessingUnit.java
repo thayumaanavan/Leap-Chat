@@ -36,7 +36,8 @@ public class ProcessingUnit {
 	Boolean trained;
 	int inputVectorDim,outputVectorDim;
 	double testRejectionPrecision,testRejectionRecall;
-	
+	int count;
+	Double countArr[];
 
    
 	/**
@@ -50,8 +51,8 @@ public class ProcessingUnit {
 		
 		trainingSample=new Matrix();
 		recognition=new DTW();
-		
-		
+		count=0;
+		countArr=new Double[1000];
 		current=new LabelledTimeSeriesClassificationData(9, null, null);
 		//current.setNumDim(9);
 		
@@ -62,28 +63,44 @@ public class ProcessingUnit {
 	 public void addData(Vector<Double> vector)
      {
 		 
-        /* for(Filter i:this.dataFilters)
-         {
-             vector = i.filter(vector);
-         }*/
+        
 		 if (this.learning || this.analyzing)
 		 {
-			 //System.out.println(vector.get(2));
-			// Boolean filter1=this.dataFilters.get(0).filter(vector);
-			// Boolean filter2=this.dataFilters.get(1).filter(vector);
-			// Boolean filter3=this.dataFilters.get(2).filter(vector);
-			// if(filter1 && filter2 && filter3)
+			 
+				 countArr[count]=(Double)vector.get(0);
+				 count++;
+			 if(!isNullData())
+			 {
 				 trainingSample.push_back(vector);
-			// else
-			//	 System.out.println("frame filtered out");
-			// System.out.println("row="+trainingSample.getNumRows());
-			// System.out.println("col="+trainingSample.getNumCols());
+			 }
+			 else
+			 
+				 this.stopRecognition();
+			 
+				 
 			 
 		 }
 			 
 		 
 		 
      }
+	 
+	 
+	 Boolean isNullData()
+	 {
+		 if(countArr.length>50)
+		 {
+			 for(int i=countArr.length;i>countArr.length-50;i--)
+			 {
+				 if(countArr[i]!=0.0)
+					 return false;
+			 }
+					 
+					return true; 
+		 }
+		 else
+			 return false;
+	 }
 	 
 	 public void startTraining()
 	 {
@@ -99,13 +116,7 @@ public class ProcessingUnit {
 		 if (this.learning)
          {
 			 
-             /*if (this.current.getCountOfData() > 0)
-             {
-            	 
-                // LabelledTimeSeriesClassificationData gesture = new LabelledTimeSeriesClassificationData(this.current);
-                 //this.trainsequence.add(gesture);
-                 //this.current = new LabelledTimeSeriesClassificationData();
-             }*/
+            
 
              this.learning = false;
              System.out.println("stopped...");
@@ -120,19 +131,10 @@ public class ProcessingUnit {
 			// System.out.println("row="+trainingSample.getNumRows());
 			 //System.out.println("col="+trainingSample.getNumCols());
 			 this.learning=false;
-			 /*for(int i=0;i<trainingSample.getNumRows();i++)
-				 for(int j=0;j<trainingSample.getNumCols();j++)
-					 System.out.print(trainingSample.dataptr[i][j]);*/
+			 
 			 trainingSample=new Matrix();
 			 System.out.println("sample added...");
-             /*if (!this.trainsequence.isEmpty())
-             {
-            	 this.learning = true;
-            	 
-            	 
-            	 this.trainsequence = new ArrayList<LabelledTimeSeriesClassificationData>();
-                 this.learning = false;
-             }*/
+             
          }
 	 }
 
@@ -216,11 +218,7 @@ public class ProcessingUnit {
 		{
 			int classLabel=testData.getDataVector().get(i).getClassLabel();
 			Matrix testMatrix=testData.getDataVector().get(i).getData();
-			//System.out.println("classLabel:"+classLabel);
-			//System.out.println("predicted:"+testMatrix);
-			//for(int x=0;x<testMatrix.getNumRows();x++)
-			//{
-				//Vector<Double> testSample=testMatrix.getRowVector(x);
+			
 				
 				if(!recognition.predict(testMatrix))
 				{
@@ -237,11 +235,7 @@ public class ProcessingUnit {
 		
 		if(! computeTestMetrics(precisionCounter,recallCounter,rejectionPrecisionCounter,rejectionRecallCounter, confusionMatrixCounter, testData.getNumSamples()))
 			return false;
-		/*System.out.println("precisionCounter:"+precisionCounter);
-		System.out.println("recallCounter:"+recallCounter);
-		System.out.println("confusionMatrixCounter:"+confusionMatrixCounter);
-		System.out.println("rejectionRecallCounter:"+rejectionRecallCounter);
-		*/
+		
 		return true;
 	}
 		
@@ -265,20 +259,8 @@ public class ProcessingUnit {
 		// TODO Auto-generated method stub
 		
 		testAccuracy=(testAccuracy/(numTestSamples))*100.0;
-		/*System.out.println("Before:");
-		System.out.println("confusionMatrix:"+this.testConfusionMatrix);
-		for(int i=0;i<testConfusionMatrix.getNumRows();i++)
-		{
-			for(int j=0;j<testConfusionMatrix.getNumCols();j++)
-				System.out.print(testConfusionMatrix.dataptr[i][j]+"  ");
-			System.out.println();
-		}
-		*/
-		/*System.out.println("FMeasure:"+testFMeasure);
-		System.out.println("Precision:"+testPrecision);
-		System.out.println("Recall:"+testRecall);
-		System.out.println("precisionCounter:"+precisionCounter);
-		System.out.println("recallCounter:"+recallCounter);*/
+		
+		
 		for(int k=0;k<recognition.getNumClasses();k++)
 		{
 			if(precisionCounter.get(k)>0)
@@ -335,9 +317,8 @@ public class ProcessingUnit {
 		
 		int predictedClassLabelIndex=0;
 		Boolean predictedClassLabelIndexFound=false;
-		//if(predictedClassLabel!=0)
-		//{
-			//System.out.println("num classes:"+recognition.getNumClasses());
+		
+			
 			for(int k=0;k<recognition.getNumClasses();k++)
 			{
 				//System.out.println("class:"+recognition.getClassLabel(k));
@@ -352,11 +333,10 @@ public class ProcessingUnit {
 			if(!predictedClassLabelIndexFound)
 				return false;
 			
-		//}
+		
 		
 		int actualClassLabelIndex=0;
-		//if(classLabel!=0)
-		//{
+		
 			for(int k=0;k<recognition.getNumClasses();k++)
 			{
 				if(classLabel==recognition.getClassLabel(k))
@@ -366,49 +346,23 @@ public class ProcessingUnit {
 					
 				}
 			}
-		//}
 		
-		//System.out.println("predicted Index:"+predictedClassLabelIndex);
-		//System.out.println("actual Index:"+actualClassLabelIndex);
+		
 		if(classLabel==predictedClassLabel)
 		{
 			testAccuracy++;
 		}
 		
-		//if(predictedClassLabel !=0)
-		//{
+		
 			if(classLabel== predictedClassLabel)
 				testPrecision.set(predictedClassLabelIndex, (testPrecision.get(predictedClassLabelIndex))+1);
-			//if(predictedClassLabel!=classLabel)
-				//precisionCounter.set(actualClassLabelIndex, (precisionCounter.get(actualClassLabelIndex))+1);
-			//else
-				precisionCounter.set(predictedClassLabelIndex, (precisionCounter.get(predictedClassLabelIndex))+1);
-		//}
-		
-		//if(classLabel !=0)
-		//{
+							precisionCounter.set(predictedClassLabelIndex, (precisionCounter.get(predictedClassLabelIndex))+1);
+	
 			if(classLabel==predictedClassLabel)
 				testRecall.set(predictedClassLabelIndex, (testRecall.get(predictedClassLabelIndex))+1);
 			recallCounter.set(actualClassLabelIndex, (recallCounter.get(actualClassLabelIndex))+1);
-		//}
 		
-	/*	if( predictedClassLabel == 0 ){
-	        if( classLabel == 0 ) testRejectionPrecision++;
-	        rejectionPrecisionCounter++;
-	    }
-
-		if( classLabel == 0 ){
-	        if( predictedClassLabel == 0 ) testRejectionRecall++;
-	        rejectionRecallCounter++;
-	    }*/
-
-		/*if( classLabel == 0 ) 
-			actualClassLabelIndex = 0;
-        else actualClassLabelIndex++;
-        if( predictedClassLabel == 0 ) 
-        	predictedClassLabelIndex = 0;
-        else predictedClassLabelIndex++;
-        */
+        
         testConfusionMatrix.dataptr[actualClassLabelIndex][predictedClassLabelIndex]+=1;
         confusionMatrixCounter.set(actualClassLabelIndex,( confusionMatrixCounter.get(actualClassLabelIndex))+1);
         

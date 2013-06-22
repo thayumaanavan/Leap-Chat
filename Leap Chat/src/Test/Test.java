@@ -86,11 +86,13 @@ class Test {
         	try {
         		Scanner in = new Scanner(System.in);
         		int ch=in.nextInt();
-        		switch(ch)
+        		if(ch==1)
         		{
-        		case 1:
+        		
         			listener.gesture.load("gesture.txt");
         			listener.gesture.train();
+        			listener.gesture.startRecognition();
+        			
         			
         		}
         	}catch (IOException e) {
