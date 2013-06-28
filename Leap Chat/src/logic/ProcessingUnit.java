@@ -24,7 +24,7 @@ import datastructure.Matrix;
 
 public class ProcessingUnit {
 	
-	
+	public static String str;
 	LabelledTimeSeriesClassificationData current;
 	public List<LabelledTimeSeriesClassificationData> trainsequence;
 	Boolean analyzing,learning;
@@ -414,7 +414,7 @@ public class ProcessingUnit {
 		//String[] sign={"Student","Super","North","South","Four","Olympic Ring","Victory","Warning","Circle","Kill","Five"};
 		String[] signs={"what is your name?","Hi!","How are you?","what are you doing?","Whats up?","lol"};
 		System.out.println(signs[id]);
-		
+		str=signs[id];
 		/*switch(id)
 		{
 		case 0:
